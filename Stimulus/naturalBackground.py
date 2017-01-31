@@ -27,7 +27,7 @@ for i in range(len(velocities)):
 	#scaleCon = (100,100,100)
 	scaleCon = (0, 0, 0)
 	backgroundColor = 255  # 0 black, 255 white 
-	scaleRes = 10  # resolution scale, to downsample later
+	scaleRes = 1  # resolution scale, to downsample later
 	fps = 200 # Frame Resolution
 	numFrames = 10 # Number of repetition frames at end and beginning 
 	#Starting position, 2 is center, 3 left up,, 4 right, down
@@ -113,24 +113,36 @@ for i in range(len(velocities)):
 		cv2.waitKey(int(math.ceil(dt)))
 		writerOut.write(imgResize)
 
+	writerOut.release()
 
-	yPosPix = []
-	xPosPix = []	
-	continueLoop = True
-	lStimScale = np.divide(lStimulus, scaleRes)
-	#print type(lStimScale)
-	for i in range(np.size(lStimScale)):
-		#print i
-		if continueLoop == True and lStimScale[i] >= 11 :
-			yPosPix.append(lStimScale[i])
-			xPosPix.append(tStimulus[i])
-			continueLoop = False 
+	cv2.destroyAllWindows()
 
-	print yPosPix
-	print xPosPix
-	plt.axvline(xPosPix)
-	plt.plot(tStimulus, lStimScale)
-	plt.show()
+
+	from tempfile import TemporaryFile
+	outfile = TemporaryFile()
+	data = []
+	data = np.column_stack((tStimulus, theta))
+	np.save(outfile,data)
+
+
+
+	# yPosPix = []
+	# xPosPix = []	
+	# continueLoop = True
+	# lStimScale = np.divide(lStimulus, scaleRes)
+	# #print type(lStimScale)
+	# for i in range(np.size(lStimScale)):
+	# 	#print i
+	# 	if continueLoop == True and lStimScale[i] >= 11 :
+	# 		yPosPix.append(lStimScale[i])
+	# 		xPosPix.append(tStimulus[i])
+	# 		continueLoop = False 
+
+	# print yPosPix
+	# print xPosPix
+	# plt.axvline(xPosPix)
+	# plt.plot(tStimulus, lStimScale)
+	# plt.show()
 
 
 
@@ -150,17 +162,5 @@ for i in range(len(velocities)):
 	# 	#imgResize = cv2.resize(img, (outWidth, outHeight) , interpolation = cv2.INTER_AREA )
 	# 	cv2.waitKey(int(math.ceil(dt)))
 	# 	writerOut.write(imgResize)
-
-
-	writerOut.release()
-
-	cv2.destroyAllWindows()
-
-
-	from tempfile import TemporaryFile
-	outfile = TemporaryFile()
-	data = []
-	data = np.column_stack((tStimulus, theta))
-	np.save(outfile,data)
 
 
