@@ -7,22 +7,22 @@ from sys import path
 #path.append('/home/atilla/Documents/Test/Neural_Network/Stimulus/')
 
 #import naturalBackground.py
-
+pixelDetect = 7
 velStim = -22 #m/s velocity of stimulus
 	#velStim = -0.08  #m/s velocity of stimulus
 	
 lStim = 0.45 #m  half length of stimulus
-xStart = 50 #m start approach distance away from specimen 
+xStart = 70 #m start approach distance away from specimen 
 
 # Set locust parameters
 xFov = 180 # degrees, fov locust azimuth
 yFov = 180 # degrees, fov locust elevation
-angPix = 0.2 # deg/pixel interommatidial angle specimen
+angPix = 1./pixelDetect # deg/pixel interommatidial angle specimen
 
 scaleCon = (0, 0, 0)
 backgroundColor = 255  # 0 black, 255 white 
 scaleRes = 10  # resolution scale, to downsample later
-fps = 200 # Frame Resolution
+fps = 200. # Frame Resolution
 numFrames = 10 # Number of repetition frames at end and beginning 
 #Starting posit
 
@@ -31,7 +31,7 @@ outHeight = 40 #Pix
 outWidth = 40 #Pix 
 
 #create a video, set True
-createVideo = False
+createVideo = True
 
 def createImage(xFov, yFov , angPix, scaleRes, backgroundColor, outWidth, outHeight):
 	#outHeight =int(round(yFov / angPix))
@@ -45,12 +45,14 @@ def createImage(xFov, yFov , angPix, scaleRes, backgroundColor, outWidth, outHei
 	return img, outHeight, outWidth, hImage, wImage
 
 
-def getParamters(velStim, xStart, fps, lStim, angPix, scaleRes, outHeight ):
+def getParamters(velStim, xStart, fps, lStim, angPix, scaleRes, outHeight, pixelDetect ):
 	yPosPix = []
 	xPosPix = []
 	ytimePix = []
 	xtimePix = []
+	tPix5 = []
 	continueLoop = True
+	find5 = True
 	dt = 1./fps 
 	tEnd = 0
 	tStart= float(xStart/velStim)
@@ -72,13 +74,17 @@ def getParamters(velStim, xStart, fps, lStim, angPix, scaleRes, outHeight ):
 		if continueLoop == True and lStimScale[i] <= outHeight :
 			yPosPix.append(lStimScale[i])
 			xPosPix.append(t[i])
+		if find5 == True and lStimScale[i]>= pixelDetect:
+			tPix5.append(t[i])
+			find5 = False
+
 
 	#return t, lPix , thetaRun, xRun, dt, lPix1, thetaDotPix, thetaPix
-	return yPosPix, xPosPix, thetaRun, dt, t
+	return yPosPix, xPosPix, thetaRun, dt, t, tPix5
 
 
 
-yPosPix,xPosPix, theta,  dt , tStimulus=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight )
+yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
 
 #plt.plot(xPosPix, yPosPix)
 #plt.show()
@@ -87,7 +93,7 @@ yPosPix,xPosPix, theta,  dt , tStimulus=getParamters(velStim, xStart, fps, lStim
 if createVideo == True:
 	img, outHeight, outWidth, hImage, wImage = createImage(xFov, yFov, angPix, scaleRes, backgroundColor, outWidth, outHeight)
 	fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-	writerOut = cv2.VideoWriter('WCS'+'_fps_'+str(fps) +'_v_' +str(velStim)+'_l_'+str(lStim)+ '_x_'+ str(xStart)+ '_Sc_'+str(scaleCon)+'_Res_'+str(outHeight) +'.avi', fourcc, fps , (outWidth, outHeight))
+	writerOut = cv2.VideoWriter('WCS'+'_fps_'+str(fps) +'_v_' +str(velStim)+'_l_'+str(lStim)+ '_x_'+ str(xStart)+ '_Sc_'+str(scaleCon)+'_Res_'+str(outHeight) +'_PixRes_'+str(pixelDetect)+'.avi', fourcc, fps , (outWidth, outHeight))
 
 	lStimulus2 =np.multiply(yPosPix, scaleRes)
 	for i in np.nditer(lStimulus2) :
@@ -143,7 +149,7 @@ partA2 = 'RaAv'
 allGroups = False 
 scale = 1
 
-
+######Plot 1#######
 
 plotTimeCol = True
 plotFile = False
@@ -164,11 +170,19 @@ if plotScatter == True :
 plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
 
 
+
+xStart =50 
+fps = 200.
+angPix = 0.2
+pixelDetect = 5
+yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
+
+
 print xFrameSpike
 print frameCollision
 print type(xFrameSpike[1])
 print type(fps)
-xTimeSpike = np.divide(xFrameSpike, 200.)
+xTimeSpike = np.divide(xFrameSpike, fps)
 print xTimeSpike
 plt.show()
 print 'done'
@@ -176,7 +190,7 @@ print 'done'
 
 for i in range(np.size(xFrameSpike)):
 	print i
-	j = xFrameSpike[i]
+	j = xFrameSpike[i]-1
 	timeSpike = xPosPix[j]
 	print timeSpike
 	pixSize = yPosPix[i]
@@ -210,25 +224,145 @@ plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2,
 
 plt.show()
 
+xStart =50 
+fps = 200.
+angPix = 0.2
+pixelDetect = 5
+yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
 
 print xFrameSpike
 print frameCollision
 print type(xFrameSpike[1])
 print type(fps)
-xTimeSpike = np.divide(xFrameSpike, 200.)
+xTimeSpike = np.divide(xFrameSpike, fps)
 print xTimeSpike
 plt.show()
 print 'done'
 
 timeSpike = []
-
+timeSpikeStore = []
 for i in range(np.size(xFrameSpike)):
 	print i
 	j = xFrameSpike[i]-1
 	timeSpike = xPosPix[j]
+	timeSpikeStore.append(timeSpike)
 	print timeSpike
 	pixSize = yPosPix[i]
+	plt.axvline(tPix5, color ='r')
 	plt.axvline(timeSpike)
 	plt.plot(xPosPix, yPosPix)
 
+# yPos5 = yPosPix 
+firstSpike= timeSpikeStore[0]-tPix5
+print firstSpike
+plt.show()
+
+
+
+plotTimeCol = False 
+plotFile = False
+plotLGMDspike = True
+plotScatter =False
+setThresholdsMan =False
+setThresholdsSpikeMan = False
+setColor = 'b'
+thresholdHue = 0.01
+thresholdSpike = 0.0004
+typeTrue = 'SquBig'
+namePlot = 'White bg. Black Square, th=0.2 40'
+
+if plotScatter == True :
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.tick_params(labelsize = 18)
+
+
+
+plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
+
+plt.show()
+
+xStart =50 
+fps = 200.
+pixelRes = 7
+angPix =1./pixelRes
+pixelDetect = 5
+yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
+
+print xFrameSpike
+print frameCollision
+print type(xFrameSpike[1])
+print type(fps)
+xTimeSpike = np.divide(xFrameSpike, fps)
+print xTimeSpike
+plt.show()
+print 'done'
+
+timeSpike = []
+timeSpikeStore = []
+for i in range(np.size(xFrameSpike)):
+	print i
+	j = xFrameSpike[i]-1
+	timeSpike = xPosPix[j]
+	timeSpikeStore.append(timeSpike)
+	print timeSpike
+	pixSize = yPosPix[i]
+	plt.axvline(tPix5, color ='r')
+	plt.axvline(timeSpike)
+	plt.plot(xPosPix, yPosPix)
+
+# yPos5 = yPosPix 
+firstSpike= timeSpikeStore[0]-tPix5
+print firstSpike
+plt.show()
+
+
+plotTimeCol = False 
+plotFile = False
+plotLGMDspike = True
+plotScatter =False
+setThresholdsMan =False
+setThresholdsSpikeMan = False
+setColor = 'b'
+thresholdHue = 0.01
+thresholdSpike = 0.0004
+typeTrue = 'squaBig'
+namePlot = 'White bg. Black Square, th=0.2 40'
+
+plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
+
+plt.show()
+
+xStart =70 
+fps = 200.
+pixelRes = 7
+angPix =1./pixelRes
+pixelDetect = 5
+yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
+
+print xFrameSpike
+print frameCollision
+print type(xFrameSpike[1])
+print type(fps)
+xTimeSpike = np.divide(xFrameSpike, fps)
+print xTimeSpike
+plt.show()
+print 'done'
+
+timeSpike = []
+timeSpikeStore = []
+for i in range(np.size(xFrameSpike)):
+	print i
+	j = xFrameSpike[i]-1
+	timeSpike = xPosPix[j]
+	timeSpikeStore.append(timeSpike)
+	print timeSpike
+	pixSize = yPosPix[i]
+	plt.axvline(tPix5, color ='r')
+	plt.axvline(timeSpike)
+	plt.plot(xPosPix, yPosPix)
+
+# yPos5 = yPosPix 
+firstSpike= timeSpikeStore[0]-tPix5
+print firstSpike
 plt.show()
