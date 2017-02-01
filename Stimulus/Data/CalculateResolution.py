@@ -80,8 +80,8 @@ def getParamters(velStim, xStart, fps, lStim, angPix, scaleRes, outHeight ):
 
 yPosPix,xPosPix, theta,  dt , tStimulus=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight )
 
-plt.plot(xPosPix, yPosPix)
-plt.show()
+#plt.plot(xPosPix, yPosPix)
+#plt.show()
 
   
 if createVideo == True:
@@ -145,15 +145,15 @@ scale = 1
 
 
 
-plotTimeCol = False
+plotTimeCol = True
 plotFile = False
-plotLGMDspike = False
+plotLGMDspike = True
 plotScatter =False
-setThresholdsMan =True
-setThresholdsSpikeMan = True
+setThresholdsMan =False
+setThresholdsSpikeMan = False
 setColor = 'b'
-thresholdHue = [0.1, 0.1,0.1, 0.2, 0.25 , 0.1, 0.25, 0.1]
-thresholdSpike = 0.01
+thresholdHue = [0.01]
+thresholdSpike = 0.004
 typeTrue = 'Square'
 namePlot = 'White bg. Black Square, th=0.2 '
 
@@ -161,5 +161,74 @@ if plotScatter == True :
 	fig = plt.figure()
 	plot = fig.add_subplot(111)
 	plot.tick_params(labelsize = 18)
-plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
+plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
 
+
+print xFrameSpike
+print frameCollision
+print type(xFrameSpike[1])
+print type(fps)
+xTimeSpike = np.divide(xFrameSpike, 200.)
+print xTimeSpike
+plt.show()
+print 'done'
+
+
+for i in range(np.size(xFrameSpike)):
+	print i
+	j = xFrameSpike[i]
+	timeSpike = xPosPix[j]
+	print timeSpike
+	pixSize = yPosPix[i]
+	plt.axvline(timeSpike)
+	plt.plot(xPosPix, yPosPix)
+
+plt.show()
+
+
+
+plotTimeCol = False 
+plotFile = False
+plotLGMDspike = True
+plotScatter =False
+setThresholdsMan =False
+setThresholdsSpikeMan = False
+setColor = 'b'
+thresholdHue = 0.01
+thresholdSpike = 0.0004
+typeTrue = 'squareBig'
+namePlot = 'White bg. Black Square, th=0.2 40'
+
+if plotScatter == True :
+	fig = plt.figure()
+	plot = fig.add_subplot(111)
+	plot.tick_params(labelsize = 18)
+
+
+
+plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
+
+plt.show()
+
+
+print xFrameSpike
+print frameCollision
+print type(xFrameSpike[1])
+print type(fps)
+xTimeSpike = np.divide(xFrameSpike, 200.)
+print xTimeSpike
+plt.show()
+print 'done'
+
+timeSpike = []
+
+for i in range(np.size(xFrameSpike)):
+	print i
+	j = xFrameSpike[i]-1
+	timeSpike = xPosPix[j]
+	print timeSpike
+	pixSize = yPosPix[i]
+	plt.axvline(timeSpike)
+	plt.plot(xPosPix, yPosPix)
+
+plt.show()
