@@ -314,6 +314,11 @@ def createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotF
 	nameFiles1 = extractFiles(filePath)
 	nameFiles = []
 
+	if plotScatter == True :
+		fig = plt.figure()
+		plot = fig.add_subplot(111)
+		plot.tick_params(labelsize = 18)
+
 
 	for i in range(len(nameFiles1)):
 		if typeTrue in nameFiles1[i]:
