@@ -22,7 +22,7 @@ angPix = 1./pixelDetect # deg/pixel interommatidial angle specimen
 scaleCon = (0, 0, 0)
 backgroundColor = 255  # 0 black, 255 white 
 scaleRes = 10  # resolution scale, to downsample later
-fps = 30. # Frame Resolution
+fps = 60. # Frame Resolution
 numFrames = 10 # Number of repetition frames at end and beginning 
 #Starting posit
 
@@ -31,16 +31,16 @@ outHeight = 40 #Pix
 outWidth = 40 #Pix 
 
 #create a video, set True
-createVideo =False
+createVideo =True
 def createImage(xFov, yFov , angPix, scaleRes, backgroundColor, outWidth, outHeight):
 	#outHeight =int(round(yFov / angPix))
 	#outWidth =int(round(xFov / angPix)) 	
 	hImage = int(round(outHeight * scaleRes)) 
 	wImage = int(round(outWidth * scaleRes))
 
-	img = np.ones((hImage,wImage,3), np.uint8)*backgroundColor
-	#img2 = cv2.imread('background5.png')
-	img = cv2.resize(img, (hImage,wImage))
+	#img = np.ones((hImage,wImage,3), np.uint8)*backgroundColor
+	img2 = cv2.imread('background5.png')
+	img = cv2.resize(img2, (hImage,wImage))
 	return img, outHeight, outWidth, hImage, wImage
 
 
@@ -92,7 +92,7 @@ yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps
 if createVideo == True:
 	img, outHeight, outWidth, hImage, wImage = createImage(xFov, yFov, angPix, scaleRes, backgroundColor, outWidth, outHeight)
 	fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-	writerOut = cv2.VideoWriter('WCS'+'_fps_'+str(fps) +'_v_' +str(velStim)+'_l_'+str(lStim)+ '_x_'+ str(xStart)+ '_Sc_'+str(scaleCon)+'_Res_'+str(outHeight) +'_PixRes_'+str(pixelDetect)+'.avi', fourcc, fps , (outWidth, outHeight))
+	writerOut = cv2.VideoWriter('WCS_NaturalBG_Grey'+'_fps_'+str(fps) +'_v_' +str(velStim)+'_l_'+str(lStim)+ '_x_'+ str(xStart)+ '_Sc_'+str(scaleCon)+'_Res_'+str(outHeight) +'_PixRes_'+str(pixelDetect)+'.avi', fourcc, fps , (outWidth, outHeight))
 
 	lStimulus2 =np.multiply(yPosPix, scaleRes)
 	for i in np.nditer(lStimulus2) :
@@ -102,7 +102,9 @@ if createVideo == True:
 		yBottomRight1 = int(round(hImage/2 + i/ 2))
 		figureSquare1 = cv2.rectangle(img,(xTopLeft1,yTopLeft1),(xBottomRight1,yBottomRight1),scaleCon, thickness = cv2.FILLED )
 		#cv2.imshow('figureSquare1', img)
-		imgResize = cv2.resize(img, (outWidth, outHeight) , interpolation = cv2.INTER_AREA )
+		
+		imgResize1 = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+		imgResize = cv2.resize(imgResize1, (outWidth, outHeight) , interpolation = cv2.INTER_AREA )
 		#imgResize = cv2.resize(img, (20, 20) , interpolation = cv2.INTER_AREA )
 
 		cv2.waitKey(int(math.ceil(dt)))
@@ -147,172 +149,3 @@ def plotPixels(xFrameSpike, fps, xPosPix , yPosPix, tPix5):
 				plot5 = plt.axvline(tPix5, color = 'r')
 	return pixPlotStim, pixplotSpike, plot5
 
-
-#Define Plots
-groupA1 = 'Hue'
-groupB1 = ' Edge Detection '
-groupC1 = 'ON cell' 
-groupC2 = ' OFF cell'
-groupD1 = 'EMD Up'
-groupD2 = 'EMD Down'
-groupD3 = 'EMD Left'
-groupD4 = 'EMD Right' 
-groupE1 = 'WTA Excit'
-groupE2 = 'WTA Inhib'
-groupF1 = 'LGMD WTA'
-groupNames= [groupA1, groupF1]#, groupE1]# groupC1, groupC2]
-partA =['_act_']# ['_inhIn_']
-partA2 = 'RaAv'
-allGroups = False 
-scale = 1
-
-######Plot 1#######
-
-plotTimeCol = True 
-plotFile = False
-plotLGMDspike = True
-plotScatter =False
-setThresholdsMan =False
-setThresholdsSpikeMan = False
-setColor = 'b'
-thresholdHue = [0.01]
-thresholdSpike = 0.004
-typeTrue = 'Square'
-namePlot = 'White bg. Black Square, th=0.2 '
-xStart =50 
-fps = 200.
-angPix = 0.2
-pixelDetect = 5
-
-plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
-yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
-plt.show()
-line1, line2, line3 = plotPixels(xFrameSpike, fps, xPosPix , yPosPix, tPix5)
-plt.show()
-
-##### Plot 2###### 
-
-plotTimeCol = False 
-plotFile = False
-plotLGMDspike = True
-plotScatter =False
-setThresholdsMan =False
-setThresholdsSpikeMan = False
-setColor = 'b'
-thresholdHue = 0.01
-thresholdSpike = 0.0004
-typeTrue = 'squareBig'
-namePlot = 'White bg. Black Square, th=0.2 40'
-xStart =50 
-fps = 200.
-angPix = 0.2
-pixelDetect = 5
-plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
-yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
-plt.show()
-line1, line2, line3 = plotPixels(xFrameSpike, fps, xPosPix , yPosPix, tPix5)
-plt.show()
-
-
-##### Plot 3 ######
-plotTimeCol = False 
-plotFile = False
-plotLGMDspike = True
-plotScatter =False
-setThresholdsMan =False
-setThresholdsSpikeMan = False
-setColor = 'b'
-thresholdHue = 0.01
-thresholdSpike = 0.0004
-typeTrue = 'SquBig'
-namePlot = 'White bg. Black Square, th=0.2 40'
-xStart =50 
-fps = 200.
-pixelRes = 7
-angPix =1./pixelRes
-pixelDetect = 5
-plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
-yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
-plt.show()
-line1, line2 , line3= plotPixels(xFrameSpike, fps, xPosPix , yPosPix, tPix5)
-plt.show()
-
-
-
-##### Plot 4 ####### 
-plotTimeCol = False 
-plotFile = False
-plotLGMDspike = True
-plotScatter =False
-setThresholdsMan =False
-setThresholdsSpikeMan = False
-setColor = 'b'
-thresholdHue = 0.001
-thresholdSpike = 0.001
-typeTrue = 'squaBig'
-namePlot = 'White bg. Black Square, th=0.2 40'
-xStart =70 
-fps = 200.
-pixelRes = 7
-angPix =1./pixelRes
-pixelDetect = 5
-
-plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
-plt.show()
-yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
-line1, line2, line3 = plotPixels(xFrameSpike, fps, xPosPix , yPosPix, tPix5)
-plt.title('200 Hz Stimulus')
-plt.show()
-
-
-##### Plot 5 #######
-plotTimeCol = False 
-plotFile = False
-plotLGMDspike = True
-plotScatter =False
-setThresholdsMan =False
-setThresholdsSpikeMan = False
-setColor = 'b'
-thresholdHue = 0.05
-thresholdSpike = 0.001
-typeTrue = 'lowFps'
-namePlot = 'White bg. Black Square, th=0.2 40'
-xStart =70 
-fps = 60.
-pixelRes = 7
-angPix =1./pixelRes
-pixelDetect = 5
-plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
-plt.show()
-yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
-line1, line2, line3 = plotPixels(xFrameSpike, fps, xPosPix , yPosPix, tPix5)
-plt.title('60 Hz Stimulus')
-plt.legend()
-plt.show()
-
-
-#### Plot 6 #### 
-
-plotTimeCol = False 
-plotFile = False
-plotLGMDspike = True
-plotScatter =False
-setThresholdsMan =False
-setThresholdsSpikeMan = False
-setColor = 'b'
-thresholdHue = 0.15
-thresholdSpike = 0.001
-typeTrue = 'squ30'
-namePlot = 'White bg. Black Square, th=0.2 40'
-xStart =70 
-fps = 30.
-pixelRes = 7
-angPix =1./pixelRes
-pixelDetect = 5
-plotDefineAgain, plotTimeCol, xTime2, plotSpikeCol, plotRegression2, xlv2, ysc2, xFrameSpike, frameCollision= datAn.createPlotFiles(filePath, partA, partA2, allGroups, groupNames, scale, plotFile, plotTimeCol, plotLGMDspike, plotScatter, setThresholdsMan, thresholdHue,  thresholdSpike, setThresholdsSpikeMan, typeTrue, setColor, namePlot)
-plt.show()
-yPosPix,xPosPix, theta,  dt , tStimulus, tPix5=getParamters(velStim, xStart, fps, lStim, angPix,scaleRes, outHeight, pixelDetect )
-line1, line2, line3 = plotPixels(xFrameSpike, fps, xPosPix , yPosPix, tPix5)
-plt.title('30 Hz Stimulus')
-plt.legend()
-plt.show()

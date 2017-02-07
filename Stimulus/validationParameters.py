@@ -14,7 +14,7 @@ xFov = 180 # degrees
 yFov = 180 # degrees
 pixRes = 5 # units
 xSize = 0.450 # m
-ySize = 0.450 # m 
+ySize = 0.150 # m 
 
 
 #Estimate parameters
@@ -23,7 +23,7 @@ xApproach = vApproach * timeReq # m
 xAngularRes = np.arctan(xSize/xApproach) * 180/math.pi *2 # degrees
 yAngularRes = np.arctan(ySize/xApproach)* 180/math.pi *2# degrees
 xResReq = xFov/xAngularRes * pixRes
-yResReq = yFov/xAngularRes * pixRes
+yResReq = yFov/yAngularRes * pixRes
 print xAngularRes
 print yAngularRes
 print xResReq

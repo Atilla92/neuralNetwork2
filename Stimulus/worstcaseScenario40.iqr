@@ -6,7 +6,7 @@
         <Module name="openCVmpeg">
             <Parameter name="Video mode" value="No selection"/>
             <Parameter name="ShowOutput" value="true"/>
-            <Parameter name="File Name" value="/home/atilla/Documents/Test/Neural_Network2/Stimulus/Data/WCS_fps_60.0_v_-22_l_0.45_x_70_Sc_(0, 0, 0)_Res_40_PixRes_7.avi"/>
+            <Parameter name="File Name" value="/home/atilla/Documents/Test/Neural_Network2/Stimulus/Data/WCS_fps_30.0_v_-22_l_0.45_x_70_Sc_(0, 0, 0)_Res_40_PixRes_7.avi"/>
             <Parameter name="Monochrome" value="false"/>
             <Parameter name="HSV" value="false"/>
             <XRefHolder name="InputFromGroup">
